@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
 
 public class BallHandler : MonoBehaviour
 {
@@ -27,6 +28,8 @@ public class BallHandler : MonoBehaviour
     void Update()
     {
         if(currentBallRigidbody == null) return;
+        
+        if (IsPointerOverUIObject()) return;
         if (!Touchscreen.current.primaryTouch.press.isPressed)
         {
             if (isDragging)
@@ -45,6 +48,14 @@ public class BallHandler : MonoBehaviour
          Vector3 worldPosition =  mainCamera.ScreenToWorldPoint(touchPosition);
 
          currentBallRigidbody.position = worldPosition;
+    }
+    private bool IsPointerOverUIObject()
+    {
+        PointerEventData eventData = new PointerEventData(EventSystem.current);
+        eventData.position = Touchscreen.current.primaryTouch.position.ReadValue();
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventData, results);
+        return results.Count > 0;
     }
 
     private void SpawnNewBall()
